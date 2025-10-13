@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f14e41c14945a4bde8d1530d8db309da
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 196960
+  packageName: Smash Out - 2D Game Template
+  packageVersion: 1.1
+  assetPath: Assets/SmashOut/Scripts/AudioButton.cs
+  uploadId: 535184

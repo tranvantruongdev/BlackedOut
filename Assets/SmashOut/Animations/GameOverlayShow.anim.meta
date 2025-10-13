@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fd5f7b87ab7724aec945ec4ec356ab64
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 196960
+  packageName: Smash Out - 2D Game Template
+  packageVersion: 1.1
+  assetPath: Assets/SmashOut/Animations/GameOverlayShow.anim
+  uploadId: 535184

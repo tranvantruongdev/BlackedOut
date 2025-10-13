@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4ced6de7cee8d430fbc5aba3f9f34e8d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 196960
+  packageName: Smash Out - 2D Game Template
+  packageVersion: 1.1
+  assetPath: Assets/SmashOut/Scripts/ScoreManager.cs
+  uploadId: 535184

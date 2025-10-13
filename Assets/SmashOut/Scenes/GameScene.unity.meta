@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0005492b555864686bc7a57242013da6
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 196960
+  packageName: Smash Out - 2D Game Template
+  packageVersion: 1.1
+  assetPath: Assets/SmashOut/Scenes/GameScene.unity
+  uploadId: 535184

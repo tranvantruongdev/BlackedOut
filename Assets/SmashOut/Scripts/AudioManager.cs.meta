@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 6385fc00be14c498da4b5aee0e0bb96a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 196960
+  packageName: Smash Out - 2D Game Template
+  packageVersion: 1.1
+  assetPath: Assets/SmashOut/Scripts/AudioManager.cs
+  uploadId: 535184
