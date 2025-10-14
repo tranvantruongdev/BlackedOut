@@ -5,39 +5,39 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; set; }
+    public static GameManager S_Instance { get; set; }
 
-    public UIManager uIManager;
-    public ScoreManager scoreManager;
+    public UIManager UIManagerReference;
+    public ScoreManager ScoreManagerReference;
 
     [Header("Game settings")]
-    public GameObject player;
-    public GameObject gameOverlay;
+    public GameObject PlayerHolder;
+    public GameObject GameOverlayHolder;
     [Space(5)]
-    public GameObject smasherPrefab;
+    public GameObject ObstaclePrefab;
     [Space(5)]
-    public int minNumberOfSmashers = 5;
-    public int maxNumberOfSmashers = 10;//can be higher value, but then the player ball needs to be smaller (depends on screen width)
+    public int MinNumberOfSmasherConfig = 6;
+    public int MaxNumberOfSmasherConfig = 10;//can be higher value, but then the player ball needs to be smaller (depends on screen width)
     [Space(5)]
-    public List<GameObject> upSmashers, bottomSmashers;
+    public List<GameObject> UpperGameObjects, BottomGameObjects;
     [Space(5)]
-    public float moveDistance; //distance between upper and bottom smashers when they are max opened
+    public float MoveDistanceConfig = 3f; //distance between upper and bottom smashers when they are max opened
     [Space(5)]
-    public float smasherMoveSpeed;
-    public bool canMove;
+    public float ObstacleMoveSpeedConfig = 0.3f;
+    public bool IsCanMove;
 
-    public List<float> smashersStartPositions, smashersTargetPositions;
-    GameObject lastSmasher;
-    Vector3 screenSize;
-    int indexShorterSmasher, currentPosition, numOfSmashers;
-    bool position; //false - down, true - up
+    public List<float> SmashersStartPositionConfigs, SmashersTargetPositionConfigs;
+    GameObject _lastObstacle;
+    Vector3 _screenSizeVector3;
+    int _indexShorterObstacle, _currentPositionInt, _numberOfObstacles;
+    bool _isPositionUp; //false - down, true - up
 
     void Awake()
     {
         DontDestroyOnLoad(this);
 
-        if (Instance == null)
-            Instance = this;
+        if (S_Instance == null)
+            S_Instance = this;
         else
             Destroy(gameObject);
     }
@@ -49,248 +49,242 @@ public class GameManager : MonoBehaviour
 
         Application.targetFrameRate = 30;
 
-        screenSize = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+        _screenSizeVector3 = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
 
-        StartCoroutine(CreateScene());
+        StartCoroutine(CreateTheScene());
     }
 
     void Update()
     {
-        if (uIManager.gameState == GameState.PLAYING_GAME && Input.GetMouseButtonDown(0) && canMove)
+        if (UIManagerReference.GameStateEnum == GameState.PLAYING_GAME && Input.GetMouseButtonDown(0) && IsCanMove)
         {
-            if (uIManager.IsButton())
+            if (UIManagerReference.IsButtonClicked())
                 return;
 
             if (Input.mousePosition.x > Screen.width * 0.5f)
             {
-                if (currentPosition < numOfSmashers)
+                if (_currentPositionInt < _numberOfObstacles)
                 {
-                    currentPosition++;
+                    _currentPositionInt++;
                     AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
                 }
             }
             else
             {
-                if (currentPosition > 0)
+                if (_currentPositionInt > 0)
                 {
-                    currentPosition--;
+                    _currentPositionInt--;
                     AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
                 }
             }
 
-            if (currentPosition >= numOfSmashers)
-                currentPosition = numOfSmashers - 1;
+            if (_currentPositionInt >= _numberOfObstacles)
+                _currentPositionInt = _numberOfObstacles - 1;
 
-            canMove = false;
-            player.transform.position = new Vector2(bottomSmashers[currentPosition].transform.position.x, bottomSmashers[currentPosition].transform.position.y + bottomSmashers[currentPosition].transform.localScale.y / 2 + player.GetComponent<SpriteRenderer>().size.y / 2);
+            IsCanMove = false;
+            PlayerHolder.transform.position = new Vector2(BottomGameObjects[_currentPositionInt].transform.position.x, BottomGameObjects[_currentPositionInt].transform.position.y + BottomGameObjects[_currentPositionInt].transform.localScale.y / 2 + PlayerHolder.GetComponent<SpriteRenderer>().size.y / 2);
         }
 
-        if (uIManager.gameState == GameState.MOVING_SMASHERS)
+        if (UIManagerReference.GameStateEnum == GameState.MOVING_SMASHERS)
         {
-
-            for (int i = 0; i < upSmashers.Count; i++)
+            for (int i = 0; i < UpperGameObjects.Count; i++)
             {
-                upSmashers[i].transform.position = Vector2.Lerp(upSmashers[i].transform.position, new Vector2(upSmashers[i].transform.position.x, smashersTargetPositions[i]), smasherMoveSpeed);
+                UpperGameObjects[i].transform.position = Vector2.Lerp(UpperGameObjects[i].transform.position, new Vector2(UpperGameObjects[i].transform.position.x, SmashersTargetPositionConfigs[i]), ObstacleMoveSpeedConfig);
             }
 
             //check if smashers reach position
-            if (Mathf.Abs(upSmashers[0].transform.position.y - smashersTargetPositions[0]) < .001f)
+            if (Mathf.Abs(UpperGameObjects[0].transform.position.y - SmashersTargetPositionConfigs[0]) < .001f)
             {
-                for (int i = 0; i < upSmashers.Count; i++)
+                for (int i = 0; i < UpperGameObjects.Count; i++)
                 {
-                    upSmashers[i].transform.position = new Vector2(upSmashers[i].transform.position.x, smashersTargetPositions[i]);
+                    UpperGameObjects[i].transform.position = new Vector2(UpperGameObjects[i].transform.position.x, SmashersTargetPositionConfigs[i]);
                 }
 
-                position = !position;
+                _isPositionUp = !_isPositionUp;
 
-                if (!position)
+                if (!_isPositionUp)
                 {
                     StartCoroutine(NewScene());
                     return;
                 }
                 else
                 {
-                    currentPosition = Random.Range(0, numOfSmashers);
-                    player.transform.position = new Vector2(bottomSmashers[currentPosition].transform.position.x, bottomSmashers[currentPosition].transform.position.y + bottomSmashers[currentPosition].transform.localScale.y / 2 + player.GetComponent<SpriteRenderer>().size.y / 2);
-                    ShowPlayer();
+                    _currentPositionInt = Random.Range(0, _numberOfObstacles);
+                    PlayerHolder.transform.position = new Vector2(BottomGameObjects[_currentPositionInt].transform.position.x, BottomGameObjects[_currentPositionInt].transform.position.y + BottomGameObjects[_currentPositionInt].transform.localScale.y / 2 + PlayerHolder.GetComponent<SpriteRenderer>().size.y / 2);
+                    ShowThePlayer();
                 }
 
-                if (uIManager.mainMenuGui.activeInHierarchy) //if main menu is active
-                    uIManager.gameState = GameState.IN_MENU;
+                if (UIManagerReference.MainMenuGuiGameObject.activeInHierarchy) //if main menu is active
+                    UIManagerReference.GameStateEnum = GameState.IN_MENU;
                 else
                 {
-                    StartCoroutine(SlideDown());
-                    uIManager.gameState = GameState.PLAYING_GAME;
+                    StartCoroutine(SlideDownAction());
+                    UIManagerReference.GameStateEnum = GameState.PLAYING_GAME;
                 }
             }
         }
 
-        if (uIManager.gameState == GameState.PLAYING_GAME && Input.GetMouseButtonUp(0))
+        if (UIManagerReference.GameStateEnum == GameState.PLAYING_GAME && Input.GetMouseButtonUp(0))
         {
-            canMove = true;
+            IsCanMove = true;
         }
     }
 
-    public void OnHomeClicked()
+    public void OnHomeClickedCoroutine()
     {
-        StartCoroutine(Restart(false));
+        StartCoroutine(RestartTheGame(false));
     }
 
     //create new scene
-    IEnumerator CreateScene()
+    IEnumerator CreateTheScene()
     {
         //Debug.Log("Creating new scene...");
 
-        HidePlayer();
+        HideThePlayer();
 
-        position = false;
+        _isPositionUp = false;
 
-        uIManager.gameState = GameState.CREATING_SCENE;
+        UIManagerReference.GameStateEnum = GameState.CREATING_SCENE;
 
-        numOfSmashers = Random.Range(minNumberOfSmashers, maxNumberOfSmashers + 1);
+        _numberOfObstacles = Random.Range(MinNumberOfSmasherConfig, MaxNumberOfSmasherConfig + 1);
 
-        float smasherWidth = (screenSize.x * 2) / numOfSmashers; // calculate smasher width
+        float smasherWidth = (_screenSizeVector3.x * 2) / _numberOfObstacles; // calculate smasher width
         float smasherHeight;
         //Debug.Log(obstacleWidth);
 
-        indexShorterSmasher = Random.Range(0, numOfSmashers); //choose index for shorter smasher
+        _indexShorterObstacle = Random.Range(0, _numberOfObstacles); //choose index for shorter smasher
 
         //create bottom smashers
-        for (int i = 0; i < numOfSmashers; i++)
+        for (int i = 0; i < _numberOfObstacles; i++)
         {
-            smasherHeight = Random.Range(screenSize.y - .6f * screenSize.y, screenSize.y - .2f * screenSize.y); //random height depends on screen height and percent of screen height - in this case .4f of screen height
-            lastSmasher = Instantiate(smasherPrefab);
-            lastSmasher.transform.localScale = new Vector2(smasherWidth, smasherHeight);
-            lastSmasher.transform.position = new Vector2(-screenSize.x + ((i + .5f) * smasherWidth), -screenSize.y + smasherHeight / 2);
-            bottomSmashers.Add(lastSmasher);
-
+            smasherHeight = Random.Range(_screenSizeVector3.y - .6f * _screenSizeVector3.y, _screenSizeVector3.y - .2f * _screenSizeVector3.y); //random height depends on screen height and percent of screen height - in this case .4f of screen height
+            _lastObstacle = Instantiate(ObstaclePrefab);
+            _lastObstacle.transform.localScale = new Vector2(smasherWidth, smasherHeight);
+            _lastObstacle.transform.position = new Vector2(-_screenSizeVector3.x + ((i + .5f) * smasherWidth), -_screenSizeVector3.y + smasherHeight / 2);
+            BottomGameObjects.Add(_lastObstacle);
         }
 
-
         //create top smashers
-        for (int i = 0; i < numOfSmashers; i++)
+        for (int i = 0; i < _numberOfObstacles; i++)
         {
-            smasherHeight = 2 * screenSize.y - bottomSmashers[i].gameObject.transform.localScale.y;
+            smasherHeight = 2 * _screenSizeVector3.y - BottomGameObjects[i].transform.localScale.y;
 
-            lastSmasher = Instantiate(smasherPrefab);
-            lastSmasher.transform.localScale = new Vector2(smasherWidth, smasherHeight);
+            _lastObstacle = Instantiate(ObstaclePrefab);
+            _lastObstacle.transform.localScale = new Vector2(smasherWidth, smasherHeight);
 
-            if (i == indexShorterSmasher) //one of the smashers needs to be put a little higher than others shorter
+            if (i == _indexShorterObstacle) //one of the smashers needs to be put a little higher than others shorter
             {
-                lastSmasher.transform.position = new Vector2(-screenSize.x + ((i + .5f) * smasherWidth), bottomSmashers[i].transform.position.y + bottomSmashers[i].transform.localScale.y / 2 + lastSmasher.transform.localScale.y / 2 + 1f);
+                _lastObstacle.transform.position = new Vector2(-_screenSizeVector3.x + ((i + .5f) * smasherWidth), BottomGameObjects[i].transform.position.y + BottomGameObjects[i].transform.localScale.y / 2 + _lastObstacle.transform.localScale.y / 2 + 1f);
             }
             else
-                lastSmasher.transform.position = new Vector2(-screenSize.x + ((i + .5f) * smasherWidth), bottomSmashers[i].transform.position.y + bottomSmashers[i].transform.localScale.y / 2 + lastSmasher.transform.localScale.y / 2);
+                _lastObstacle.transform.position = new Vector2(-_screenSizeVector3.x + ((i + .5f) * smasherWidth), BottomGameObjects[i].transform.position.y + BottomGameObjects[i].transform.localScale.y / 2 + _lastObstacle.transform.localScale.y / 2);
 
-            smashersStartPositions.Add(lastSmasher.transform.position.y); //save last smasher position
-            smashersTargetPositions.Add(lastSmasher.transform.position.y + moveDistance);
+            SmashersStartPositionConfigs.Add(_lastObstacle.transform.position.y); //save last smasher position
+            SmashersTargetPositionConfigs.Add(_lastObstacle.transform.position.y + MoveDistanceConfig);
 
-            upSmashers.Add(lastSmasher);
-
+            UpperGameObjects.Add(_lastObstacle);
         }
 
         AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.SlideAudio);
-        uIManager.gameState = GameState.MOVING_SMASHERS;
+        UIManagerReference.GameStateEnum = GameState.MOVING_SMASHERS;
 
         yield return new WaitForSeconds(.1f);
 
-        gameOverlay.GetComponent<Animator>().Play("GameOverlayHide");
-
+        GameOverlayHolder.GetComponent<Animator>().Play("GameOverlayHide");
     }
 
-    public void Slide()
+    public void SlideCoroutine()
     {
-        StartCoroutine(SlideDown());
+        StartCoroutine(SlideDownAction());
     }
 
     IEnumerator NewScene()
     {
-        uIManager.gameState = GameState.CREATING_SCENE;
-        ScoreManager.Instance.UpdateScore(1);
+        UIManagerReference.GameStateEnum = GameState.CREATING_SCENE;
+        ScoreManager.S_Instance.UpdateScoreValue(1);
 
         yield return new WaitForSeconds(.6f);
 
-
-        ClearScene();
-        StartCoroutine(CreateScene());
+        ClearTheScene();
+        StartCoroutine(CreateTheScene());
     }
 
-    IEnumerator SlideDown()
+    IEnumerator SlideDownAction()
     {
         AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.CounterAudio);
 
-        for (int i = 0; i < numOfSmashers; i++)
+        for (int i = 0; i < _numberOfObstacles; i++)
         {
-            smashersTargetPositions[i] = smashersStartPositions[i];
+            SmashersTargetPositionConfigs[i] = SmashersStartPositionConfigs[i];
         }
 
         yield return new WaitForSeconds(3.5f);
 
         AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.SlideAudio);
-        uIManager.gameState = GameState.MOVING_SMASHERS;
+        UIManagerReference.GameStateEnum = GameState.MOVING_SMASHERS;
     }
 
-    public void ShowPlayer()
+    public void ShowThePlayer()
     {
-        player.gameObject.GetComponent<SpriteRenderer>().enabled = true;
-        player.gameObject.GetComponent<CircleCollider2D>().enabled = true;
+        PlayerHolder.GetComponent<SpriteRenderer>().enabled = true;
+        PlayerHolder.GetComponent<CircleCollider2D>().enabled = true;
     }
 
-    public void HidePlayer()
+    public void HideThePlayer()
     {
-        player.gameObject.GetComponent<SpriteRenderer>().enabled = false;
-        player.gameObject.GetComponent<CircleCollider2D>().enabled = false;
+        PlayerHolder.GetComponent<SpriteRenderer>().enabled = false;
+        PlayerHolder.GetComponent<CircleCollider2D>().enabled = false;
     }
 
     //restart game, reset score, update platform position
-    public void RestartGame()
+    public void RestartTheGame()
     {
-        StartCoroutine(Restart(true));
+        StartCoroutine(RestartTheGame(true));
     }
 
-    IEnumerator Restart(bool startGame)
+    IEnumerator RestartTheGame(bool startGame)
     {
-        gameOverlay.GetComponent<Animator>().Play("GameOverlayShow");
+        GameOverlayHolder.GetComponent<Animator>().Play("GameOverlayShow");
 
         yield return new WaitForSeconds(.6f);
 
         if (startGame)
-            uIManager.ShowGameplay();
+            UIManagerReference.ShowGameplayUI();
 
-        ClearScene();
-        scoreManager.ResetCurrentScore();
-        StartCoroutine(CreateScene());
+        ClearTheScene();
+        ScoreManagerReference.ResetTheCurrentScoreValue();
+        StartCoroutine(CreateTheScene());
     }
 
 
     //clear all scene elements
-    public void ClearScene()
+    public void ClearTheScene()
     {
-        smashersStartPositions.Clear();
-        smashersTargetPositions.Clear();
-        upSmashers.Clear();
-        bottomSmashers.Clear();
+        SmashersStartPositionConfigs.Clear();
+        SmashersTargetPositionConfigs.Clear();
+        UpperGameObjects.Clear();
+        BottomGameObjects.Clear();
 
         GameObject[] obstacles = GameObject.FindGameObjectsWithTag("Obstacle");
 
-        foreach (GameObject item in obstacles)
+        foreach (GameObject obstacle in obstacles)
         {
-            Destroy(item);
+            Destroy(obstacle);
         }
     }
 
     //show game over gui
-    public void GameOver()
+    public void GameOverAction()
     {
-        if (uIManager.gameState == GameState.PLAYING_GAME || uIManager.gameState == GameState.MOVING_SMASHERS)
+        if (UIManagerReference.GameStateEnum == GameState.PLAYING_GAME || UIManagerReference.GameStateEnum == GameState.MOVING_SMASHERS)
         {
             StopAllCoroutines();
             AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.GameOverAudio);
             AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.SmashAudio);
             AudioManager.S_Instance.PlayMusicClip(AudioManager.S_Instance.MenuMusicAudio);
-            uIManager.ShowGameOver();
-            player.gameObject.GetComponent<SpriteRenderer>().enabled = false;
-            scoreManager.UpdateScoreGameover();
+            UIManagerReference.ShowGameOver();
+            PlayerHolder.GetComponent<SpriteRenderer>().enabled = false;
+            ScoreManagerReference.UpdateScoreGameoverState();
         }
     }
 }

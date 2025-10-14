@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Obstacle") && collision.gameObject.transform.position.y > transform.position.y)
         {
-            GameManager.Instance.GameOver();
+            GameManager.S_Instance.GameOverAction();
         }
     }
 }
