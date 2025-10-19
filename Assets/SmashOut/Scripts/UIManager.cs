@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [Header("GUI Components")]
-    public GameObject MainMenuGuiGameObject;
-    public GameObject PauseGuiGameObject, GameOverGuiGameObject;
+    public GameObject MainMenuGuiGameObject, PauseGuiGameObject;
+    public GameObject GameplayGuiGameObject, GameOverGuiGameObject;
 
     public GameState GameStateEnum;
 
@@ -18,8 +18,9 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         MainMenuGuiGameObject.SetActive(true);
-        PauseGuiGameObject.SetActive(false);
+        GameplayGuiGameObject.SetActive(false);
         GameOverGuiGameObject.SetActive(false);
+        PauseGuiGameObject.SetActive(false);
         GameStateEnum = GameState.IN_MENU;
     }
 
@@ -43,8 +44,9 @@ public class UIManager : MonoBehaviour
         ScoreManager.S_Instance.ResetTheCurrentScoreValue();
         _isClicked = true;
         MainMenuGuiGameObject.SetActive(true);
-        PauseGuiGameObject.SetActive(false);
+        GameplayGuiGameObject.SetActive(false);
         GameOverGuiGameObject.SetActive(false);
+        PauseGuiGameObject.SetActive(false);
 
         GameStateEnum = GameState.IN_MENU;
         AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
@@ -56,8 +58,9 @@ public class UIManager : MonoBehaviour
     public void ShowGameplayUI()
     {
         MainMenuGuiGameObject.SetActive(false);
-        PauseGuiGameObject.SetActive(true);
+        GameplayGuiGameObject.SetActive(true);
         GameOverGuiGameObject.SetActive(false);
+        PauseGuiGameObject.SetActive(false);
         GameStateEnum = GameState.PLAYING_GAME;
         AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
         AudioManager.S_Instance.PlayMusicClip(AudioManager.S_Instance.GameMusicAudio);
@@ -68,8 +71,9 @@ public class UIManager : MonoBehaviour
     public void ShowGameOver()
     {
         MainMenuGuiGameObject.SetActive(false);
-        PauseGuiGameObject.SetActive(false);
+        GameplayGuiGameObject.SetActive(false);
         GameOverGuiGameObject.SetActive(true);
+        PauseGuiGameObject.SetActive(false);
         GameStateEnum = GameState.GAME_OVER;
     }
 
@@ -92,5 +96,39 @@ public class UIManager : MonoBehaviour
         }
 
         return tmp;
+    }
+
+    // Pause the game and show pause UI
+    public void PauseGame()
+    {
+        if (GameStateEnum == GameState.PLAYING_GAME)
+        {
+            GameStateEnum = GameState.PAUSE;
+            Time.timeScale = 0f;
+            PauseGuiGameObject.SetActive(true);
+            AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
+        }
+    }
+
+    // Resume the game and hide pause UI
+    public void ResumeGame()
+    {
+        if (GameStateEnum == GameState.PAUSE)
+        {
+            GameStateEnum = GameState.PLAYING_GAME;
+            Time.timeScale = 1f;
+            PauseGuiGameObject.SetActive(false);
+            AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
+        }
+    }
+
+    // Return to main menu from pause screen
+    public void ReturnToMainMenu()
+    {
+        if (GameStateEnum == GameState.PAUSE)
+        {
+            Time.timeScale = 1f;
+            ShowMainMenuUI();
+        }
     }
 }
