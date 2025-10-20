@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class ScoreManager : MonoBehaviour
@@ -64,5 +64,11 @@ public class ScoreManager : MonoBehaviour
 
         CurrentScoreGameOverText.text = CurrentScoreCounter.ToString();
         HighScoreGameOverText.text = HighScoreCounter.ToString();
+
+        // Cập nhật điểm cao nhất cho SkinService
+        if (GameManager.S_Instance != null && GameManager.S_Instance.SkinServiceReference != null)
+        {
+            GameManager.S_Instance.SkinServiceReference.OnScoreCommitted(HighScoreCounter);
+        }
     }
 }

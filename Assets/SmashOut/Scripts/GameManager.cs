@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
 
     public UIManager UIManagerReference;
     public ScoreManager ScoreManagerReference;
+    public SkinService SkinServiceReference;
 
     [Header("Game settings")]
     public GameObject PlayerHolder;
@@ -42,8 +43,18 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    // Start is called before the first frame update
     void Start()
+    {
+        // Đảm bảo SkinService được khởi tạo trước khi game bắt đầu
+        if (SkinServiceReference != null && SkinServiceReference.catalog != null)
+        {
+            SkinServiceReference.Initialize(SkinServiceReference.catalog);
+        }
+
+        InitializeGame();
+    }
+
+    void InitializeGame()
     {
         Physics2D.gravity = new Vector2(0, 0f);
 
@@ -51,7 +62,45 @@ public class GameManager : MonoBehaviour
 
         _screenSizeVector3 = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
 
+        // Đảm bảo PlayerHolder có PlayerSkinApplier
+        SetupPlayerSkinApplier();
+
         StartCoroutine(CreateTheScene());
+    }
+
+    void SetupPlayerSkinApplier()
+    {
+        if (PlayerHolder != null)
+        {
+            var playerSkinApplier = PlayerHolder.GetComponent<PlayerSkinApplier>();
+            if (playerSkinApplier == null)
+            {
+                playerSkinApplier = PlayerHolder.AddComponent<PlayerSkinApplier>();
+
+                // Setup references
+                var spriteRenderer = PlayerHolder.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null)
+                {
+                    playerSkinApplier.playerRenderer = spriteRenderer;
+                }
+
+                // Tìm TrailRenderer nếu có
+                var trailRenderer = PlayerHolder.GetComponent<TrailRenderer>();
+                if (trailRenderer != null)
+                {
+                    playerSkinApplier.trailRenderer = trailRenderer;
+                }
+
+                Debug.Log("Added PlayerSkinApplier to PlayerHolder");
+            }
+
+            // Áp dụng skin hiện tại nếu có
+            if (SkinServiceReference != null && SkinServiceReference.Equipped != null)
+            {
+                playerSkinApplier.ApplySkin(SkinServiceReference.Equipped);
+                Debug.Log($"Applied initial skin to player: {SkinServiceReference.Equipped.displayName}");
+            }
+        }
     }
 
     void Update()
@@ -228,6 +277,13 @@ public class GameManager : MonoBehaviour
     {
         PlayerHolder.GetComponent<SpriteRenderer>().enabled = true;
         PlayerHolder.GetComponent<CircleCollider2D>().enabled = true;
+
+        // Đảm bảo skin được áp dụng khi hiển thị player
+        var playerSkinApplier = PlayerHolder.GetComponent<PlayerSkinApplier>();
+        if (playerSkinApplier != null && SkinServiceReference != null && SkinServiceReference.Equipped != null)
+        {
+            playerSkinApplier.ApplySkin(SkinServiceReference.Equipped);
+        }
     }
 
     public void HideThePlayer()

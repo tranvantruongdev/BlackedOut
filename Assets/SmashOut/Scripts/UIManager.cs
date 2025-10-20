@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     [Header("GUI Components")]
     public GameObject MainMenuGuiGameObject, PauseGuiGameObject;
     public GameObject GameplayGuiGameObject, GameOverGuiGameObject;
+    public GameObject ShopGuiGameObject;
 
     public GameState GameStateEnum;
 
@@ -21,12 +22,16 @@ public class UIManager : MonoBehaviour
         GameplayGuiGameObject.SetActive(false);
         GameOverGuiGameObject.SetActive(false);
         PauseGuiGameObject.SetActive(false);
+        ShopGuiGameObject.SetActive(false);
         GameStateEnum = GameState.IN_MENU;
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && GameStateEnum == GameState.IN_MENU && !_isClicked)
+        if (Input.GetMouseButtonDown(0)
+            && GameStateEnum == GameState.IN_MENU
+            && !_isClicked
+            && GameStateEnum != GameState.SHOP)
         {
             if (IsButtonClicked())
                 return;
@@ -47,11 +52,30 @@ public class UIManager : MonoBehaviour
         GameplayGuiGameObject.SetActive(false);
         GameOverGuiGameObject.SetActive(false);
         PauseGuiGameObject.SetActive(false);
+        ShopGuiGameObject.SetActive(false);
 
         GameStateEnum = GameState.IN_MENU;
         AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
 
         GameManager.S_Instance.OnHomeClickedCoroutine();
+    }
+
+    //show shop UI
+    public void ShowShopUI()
+    {
+        ShopGuiGameObject.SetActive(true);
+
+        GameStateEnum = GameState.SHOP;
+        AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
+    }
+
+    //show shop UI
+    public void HideShopUI()
+    {
+        ShopGuiGameObject.SetActive(false);
+
+        GameStateEnum = GameState.IN_MENU;
+        AudioManager.S_Instance.PlayEffectsAudio(AudioManager.S_Instance.ButtonClickAudio);
     }
 
     //show gameplay gui

@@ -5,5 +5,6 @@
     CREATING_SCENE,
     MOVING_SMASHERS,
     GAME_OVER,
-    PAUSE
+    PAUSE,
+    SHOP
 }
