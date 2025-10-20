@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 3
   displayName: Default
-  icon: {fileID: 21300000, guid: db98128d89a3f0041a1953ebf89ae47e, type: 3}
+  icon: {fileID: 21300000, guid: 4c41c317b4a30ce45be3e068ae4c353d, type: 3}
   requiredScore: 0
   isDefault: 0
   playerColor: {r: 1, g: 1, b: 1, a: 1}
-  playerSprite: {fileID: 21300000, guid: db98128d89a3f0041a1953ebf89ae47e, type: 3}
+  playerSprite: {fileID: 21300000, guid: 4c41c317b4a30ce45be3e068ae4c353d, type: 3}
   trailMaterial: {fileID: 2100000, guid: 2cada9b05c20a47b49d39e7c0f3f62a6, type: 2}

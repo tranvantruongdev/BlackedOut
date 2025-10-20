@@ -1023,7 +1023,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Boutique
+  m_text: "\u0411\u0443\u0442\u0456\u043A"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 98d76ee27214b43d6aa868f8ad07edc6, type: 2}
   m_sharedMaterial: {fileID: 1771289356195765254, guid: 98d76ee27214b43d6aa868f8ad07edc6,
@@ -1160,7 +1160,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: D'accord
+  m_text: "\u0413\u0430\u0440\u0430\u0437\u0434"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7b3d6ece38a74e109fa1e7ee9b74819, type: 2}
   m_sharedMaterial: {fileID: 7574138947899470792, guid: d7b3d6ece38a74e109fa1e7ee9b74819,
@@ -1290,7 +1290,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 200, y: 200}
-  m_Spacing: {x: 35, y: 35}
+  m_Spacing: {x: 15, y: 35}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!1001 &4241554198141592107
