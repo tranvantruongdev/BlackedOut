@@ -341,6 +341,7 @@ public class GameManager : MonoBehaviour
             UIManagerReference.ShowGameOver();
             PlayerHolder.GetComponent<SpriteRenderer>().enabled = false;
             ScoreManagerReference.UpdateScoreGameoverState();
+            Debug.Log("1234");
         }
     }
 }
